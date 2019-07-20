@@ -19,20 +19,24 @@ export class TasksService {
     return this.taskRepository.getTasks(filterDTO, user);
   }
 
-  async getTaskById(id: number): Promise<Task> {
-    return this.taskRepository.getTaskByID(id);
+  async getTaskById(id: number, user: User): Promise<Task> {
+    return this.taskRepository.getTaskByID(id, user);
   }
 
   async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<Task> {
     return this.taskRepository.createTask(createTaskDTO, user);
   }
 
-  async deleteTask(id: number): Promise<void> {
-    const task = await this.getTaskById(id);
+  async deleteTask(id: number, user: User): Promise<void> {
+    const task = await this.getTaskById(id, user);
     await this.taskRepository.delete(task);
   }
 
-  async updateTaskStatus(id: number, status: TaskStatus): Promise<Task> {
-    return this.taskRepository.updateTaskStatus(id, status);
+  async updateTaskStatus(
+    id: number,
+    status: TaskStatus,
+    user: User,
+  ): Promise<Task> {
+    return this.taskRepository.updateTaskStatus(id, status, user);
   }
 }
