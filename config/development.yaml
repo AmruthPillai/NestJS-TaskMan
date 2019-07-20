@@ -1,0 +1,8 @@
+db:
+  host: 'localhost'
+  username: 'amruthpillai'
+  password: ''
+  synchronize: true
+
+jwt:
+  secret: 'topSecretArea51'
