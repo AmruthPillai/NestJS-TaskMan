@@ -6,6 +6,7 @@ import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
 import { TaskRepository } from './task.repository';
+import { User } from '../auth/user.entity';
 
 @Injectable()
 export class TasksService {
@@ -14,43 +15,16 @@ export class TasksService {
     private readonly taskRepository: TaskRepository,
   ) {}
 
-  async getTasks(filterDTO: GetTasksFilterDTO): Promise<Task[]> {
-    const { status, search } = filterDTO;
-    const query = this.taskRepository.createQueryBuilder('task');
-
-    if (status) {
-      query.andWhere('task.status = :status', { status });
-    }
-
-    if (search) {
-      query.andWhere(
-        '(task.title LIKE :search OR task.description LIKE :search)',
-        { search: `%${search}%` },
-      );
-    }
-
-    const tasks = await query.getMany();
-    return tasks;
+  async getTasks(filterDTO: GetTasksFilterDTO, user: User): Promise<Task[]> {
+    return this.taskRepository.getTasks(filterDTO, user);
   }
 
   async getTaskById(id: number): Promise<Task> {
-    const found = await this.taskRepository.findOne(id);
-
-    if (!found) {
-      throw new NotFoundException(`Task with ID ${id} was not found!`);
-    }
-
-    return found;
+    return this.taskRepository.getTaskByID(id);
   }
 
-  async createTask(createTaskDTO: CreateTaskDTO): Promise<Task> {
-    const { title, description } = createTaskDTO;
-    const task = new Task();
-    task.title = title;
-    task.description = description;
-    task.status = TaskStatus.OPEN;
-    await task.save();
-    return task;
+  async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<Task> {
+    return this.taskRepository.createTask(createTaskDTO, user);
   }
 
   async deleteTask(id: number): Promise<void> {
@@ -59,9 +33,6 @@ export class TasksService {
   }
 
   async updateTaskStatus(id: number, status: TaskStatus): Promise<Task> {
-    const task = await this.getTaskById(id);
-    task.status = status;
-    await task.save();
-    return task;
+    return this.taskRepository.updateTaskStatus(id, status);
   }
 }
